@@ -5,15 +5,18 @@
  */
 package MyLoginServlets;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Cashton
  */
-public class User {
-   private String username;
-   private String password;
+public class User implements Serializable{
+    private String username;
+    private String password;
     
-    public User(){   
+    public User(){  
+        
     }
     
     public User (String username, String password){
