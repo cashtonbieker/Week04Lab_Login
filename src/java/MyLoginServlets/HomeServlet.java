@@ -21,15 +21,15 @@ public class HomeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
- 
-        String logout = request.getParameter("logout"); 
-                
+        
         User user = (User) session.getAttribute("user");
         
+        //If a user does not exist, send them to the login page
         if (user == null){
             getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
         }
         
+        //If a user exists, display the home page
         else{
             request.setAttribute("hello", user.getUsername());
             getServletContext().getRequestDispatcher("/WEB-INF/home.jsp").forward(request, response);
@@ -40,7 +40,8 @@ public class HomeServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        
+       
+       //Display the user
        User user = (User) session.getAttribute("user"); 
        request.setAttribute("hello", user.getUsername());
        getServletContext().getRequestDispatcher("/WEB-INF/home.jsp").forward(request, response);

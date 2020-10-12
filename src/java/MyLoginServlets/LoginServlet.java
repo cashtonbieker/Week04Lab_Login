@@ -23,20 +23,21 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         
+        //Invalidate old session if user has logged out
         String logout = request.getParameter("logout");
-        
         if(logout != null){
             session.invalidate();
             session = request.getSession();
             request.setAttribute("error", "You have successfully logged out");
         }
         
+        //If there is no current user, require them to login
         User user = (User) session.getAttribute("user");
-
         if (user == null){
         getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
         }
         
+        //If a user exists, send them to the home page
         session.setAttribute("user", user);
         response.sendRedirect(getServletContext().getContextPath().concat("/home"));
         
@@ -50,22 +51,23 @@ public class LoginServlet extends HttpServlet {
         
         AccountServices validate = new AccountServices();
         
-        
+        //Pass input parameters into variables
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         
-        
-        
+        //Check if parameters passed in have a value
         if (username == null || password == null){
             request.setAttribute("error", "Invalid entry. Try again");
             getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
         }
-            
+        
+        //Push parameters through validation method
         if(validate.login(username, password) == null){
             request.setAttribute("error", "Invalid entry. Try again");
             getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
         }
         
+        //Set a session attribute with the varified parameters
         if(validate.login(username, password) != null){
             User user = new User();
             user.setUsername(username);
