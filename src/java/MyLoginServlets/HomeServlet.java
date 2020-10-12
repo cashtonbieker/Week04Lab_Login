@@ -20,20 +20,30 @@ public class HomeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession sesh = request.getSession();
+        HttpSession session = request.getSession();
+ 
+        String logout = request.getParameter("logout"); 
+                
+        User user = (User) session.getAttribute("user");
         
-        String check = (String) sesh.getAttribute("check");
-        
-        if (check == null){
-          getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+        if (user == null){
+            getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
         }
         
-        getServletContext().getRequestDispatcher("/WEB-INF/home.jsp").forward(request, response);
+        else{
+            request.setAttribute("hello", user.getUsername());
+            getServletContext().getRequestDispatcher("/WEB-INF/home.jsp").forward(request, response);
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        
+       User user = (User) session.getAttribute("user"); 
+       request.setAttribute("hello", user.getUsername());
+       getServletContext().getRequestDispatcher("/WEB-INF/home.jsp").forward(request, response);
         
     }
 

@@ -16,9 +16,6 @@ import javax.servlet.http.HttpSession;
 
 
 
-
-
-
 public class LoginServlet extends HttpServlet {
     
     @Override
@@ -26,44 +23,58 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         
-        User user = (User) session.getAttribute("user");
+        String logout = request.getParameter("logout");
         
-        if(user.getUsername() == null){
-            user = new User();
-            session.setAttribute("user", user);
-            getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+        if(logout != null){
+            session.invalidate();
+            session = request.getSession();
+            request.setAttribute("error", "You have successfully logged out");
         }
         
-        getServletContext().getRequestDispatcher("/WEB-INF/home.jsp").forward(request, response);
+        User user = (User) session.getAttribute("user");
+
+        if (user == null){
+        getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+        }
         
+        session.setAttribute("user", user);
+        response.sendRedirect(getServletContext().getContextPath().concat("/home"));
         
     }
 
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
+        
         AccountServices validate = new AccountServices();
-        User user;
+        
         
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         
-        if (username != null && password != null){
         
-            if(validate.login(username, password) == null){
-                request.setAttribute("error", "Invalid entry. Try again");
-                getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
-            }
+        
+        if (username == null || password == null){
+            request.setAttribute("error", "Invalid entry. Try again");
+            getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+        }
             
-            user = validate.login(username, password);
-            session.setAttribute("user", user.getUsername());
-            getServletContext().getRequestDispatcher("/WEB-INF/home.jsp").forward(request, response);
-        
+        if(validate.login(username, password) == null){
+            request.setAttribute("error", "Invalid entry. Try again");
+            getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
         }
         
-        request.setAttribute("error", "Invalid entry. Try again");
-        getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+        if(validate.login(username, password) != null){
+            User user = new User();
+            user.setUsername(username);
+            
+            session.setAttribute("user", user);
+            response.sendRedirect(getServletContext().getContextPath().concat("/home"));
+            
+        }
+        
     }
 
 
